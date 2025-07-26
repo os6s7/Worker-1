@@ -17,7 +17,7 @@ async def send_welcome(message: types.Message):
     keyboard = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton(
         text="🎁 افتح الميني أب",
-        web_app=types.WebAppInfo(url="https://worker-1-fxao.onrender.com/")
+        web_app=types.WebAppInfo(url="https://telegram-web-app-j6du.onrender.com/"
     )
     keyboard.add(btn)
     await message.reply("أهلاً بك! اضغط الزر أدناه:", reply_markup=keyboard)
