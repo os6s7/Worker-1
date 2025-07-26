@@ -1,33 +1,30 @@
-import os
-import asyncio
-import threading
 from fastapi import FastAPI
 from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
+import os
+import asyncio
 
+app = FastAPI()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
-app = FastAPI()
-
-@dp.message(commands=["start"])
-async def start_handler(message: types.Message):
+@dp.message_handler(commands=["start"])
+async def handle_start(message: types.Message):
     keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(
-        types.InlineKeyboardButton(
-            text="🎁 افتح الميني أب",
-            web_app=types.WebAppInfo(url="https://telegram-web-app-j6du.onrender.com/")
-        )
-    )
+    keyboard.add(types.InlineKeyboardButton(
+        text="🎁 افتح الميني أب",
+        web_app=types.WebAppInfo(url="https://worker-1-fxao.onrender.com/")
+    ))
     await message.answer("أهلاً بك! جرّب الميني أب من الزر:", reply_markup=keyboard)
 
-def run_bot():
-    asyncio.run(dp.start_polling())
+async def run_bot():
+    await executor.start_polling(dp, skip_updates=True)
 
 @app.on_event("startup")
-async def on_startup():
-    threading.Thread(target=run_bot, daemon=True).start()
+async def startup_event():
+    asyncio.create_task(run_bot())
 
 @app.get("/")
 async def root():
-    return {"message": "Bot is running"}
+    return {"status": "Bot is running!"}
