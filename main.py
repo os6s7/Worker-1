@@ -1,14 +1,12 @@
 import os
-from fastapi import FastAPI, Request
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.utils import executor
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API_TOKEN = os.getenv("BOT_TOKEN")
-WEBHOOK_HOST = os.getenv("WEBHOOK_HOST")
-WEBHOOK_PATH = ""
-WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-
-app = FastAPI()
 
 bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
@@ -24,20 +22,6 @@ async def send_welcome(message: types.Message):
     keyboard.add(btn)
     await message.reply("أهلاً بك! اضغط الزر أدناه:", reply_markup=keyboard)
 
-@app.on_event("startup")
-async def on_startup():
-    await bot.set_webhook(WEBHOOK_URL)
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    await bot.delete_webhook()
-
-@app.post("/")
-async def telegram_webhook(req: Request):
-    update = types.Update(**await req.json())
-    await dp.process_update(update)
-    return {"ok": True}
-
-@app.get("/")
-async def root():
-    return {"status": "Bot is alive!"}
+if __name__ == "__main__":
+    # تأكد تحذف أو تلغي أي ويب هووك مفعل للبوت قبل التشغيل
+    executor.start_polling(dp, skip_updates=True)
