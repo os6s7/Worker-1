@@ -1,13 +1,19 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-import asyncio
+from aiogram.dispatcher.webhook import get_new_configured_app
+from aiogram.utils.executor import start_webhook
+import logging
+
+API_TOKEN = os.getenv("BOT_TOKEN", "8229929028:AAHv5EuXqcGN-BHEjCrCt6VmklQY5LibLsc")
+WEBHOOK_HOST = "https://worker-1-fxao.onrender.com"
+WEBHOOK_PATH = ""
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 app = FastAPI()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
@@ -21,12 +27,19 @@ async def send_welcome(message: types.Message):
     keyboard.add(btn)
     await message.reply("أهلاً بك! اضغط الزر أدناه:", reply_markup=keyboard)
 
-async def start_bot():
-    await dp.start_polling()
-
 @app.on_event("startup")
-async def startup():
-    asyncio.create_task(start_bot())
+async def on_startup():
+    await bot.set_webhook(WEBHOOK_URL)
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    await bot.delete_webhook()
+
+@app.post("/")
+async def telegram_webhook(req: Request):
+    update = types.Update(**await req.json())
+    await dp.process_update(update)
+    return {"ok": True}
 
 @app.get("/")
 async def root():
