@@ -2,12 +2,9 @@ import os
 from fastapi import FastAPI, Request
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher.webhook import get_new_configured_app
-from aiogram.utils.executor import start_webhook
-import logging
 
-API_TOKEN = os.getenv("BOT_TOKEN", "8229929028:AAHv5EuXqcGN-BHEjCrCt6VmklQY5LibLsc")
-WEBHOOK_HOST = "https://worker-1-fxao.onrender.com"
+API_TOKEN = os.getenv("BOT_TOKEN")
+WEBHOOK_HOST = os.getenv("WEBHOOK_HOST")
 WEBHOOK_PATH = ""
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
